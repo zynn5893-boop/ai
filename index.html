@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mahiru AI — LangitDev</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    body { display:flex; min-height:100vh; overflow:hidden; }
+
+    .left {
+      flex:1; display:flex; flex-direction:column; justify-content:center;
+      padding:64px 72px; position:relative; overflow:hidden; z-index:1;
+    }
+    .left::before {
+      content:''; position:absolute; top:-240px; left:-120px;
+      width:700px; height:700px;
+      background:radial-gradient(circle, rgba(240,180,41,0.07) 0%, transparent 65%);
+      pointer-events:none;
+    }
+    .brand-wrap { margin-bottom:68px; }
+    .hero {
+      font-family:'Syne',sans-serif; font-size:clamp(2.4rem,4vw,3.6rem);
+      font-weight:800; line-height:1.1; letter-spacing:-0.02em; margin-bottom:18px;
+    }
+    .hero .hl {
+      background:linear-gradient(90deg,#f0b429,#fbbf24,#f97316);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .hero-sub { font-size:1rem; color:var(--text2); line-height:1.7; max-width:400px; margin-bottom:44px; }
+    .feature-list { display:flex; flex-direction:column; gap:12px; }
+    .feature-item { display:flex; align-items:center; gap:12px; font-size:0.88rem; color:var(--text2); }
+    .feature-dot {
+      width:28px; height:28px; border-radius:7px; background:var(--surface2);
+      border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+      font-size:13px; flex-shrink:0;
+    }
+
+    .right {
+      width:480px; min-height:100vh; background:var(--surface);
+      border-left:1px solid var(--border); display:flex; flex-direction:column;
+      justify-content:center; padding:52px 48px; position:relative; z-index:1; overflow-y:auto;
+    }
+    .tabs {
+      display:flex; background:var(--bg2); border:1px solid var(--border);
+      border-radius:var(--radius); padding:4px; margin-bottom:32px; gap:4px;
+    }
+    .tab {
+      flex:1; padding:9px; border-radius:7px; background:transparent; color:var(--muted);
+      font-size:0.86rem; font-weight:600; transition:all 0.2s;
+    }
+    .tab.active { background:linear-gradient(135deg,#f0b429,#d97706); color:#0a0800; }
+
+    .form-title {
+      font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800;
+      letter-spacing:-0.02em; margin-bottom:4px;
+    }
+    .form-subtitle { font-size:0.85rem; color:var(--muted); margin-bottom:28px; }
+
+    .password-wrap { position:relative; }
+    .password-wrap input { padding-right:42px; }
+    .eye-btn {
+      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      background:none; color:var(--muted); font-size:14px; padding:4px; transition:color 0.15s;
+    }
+    .eye-btn:hover { color:var(--text); }
+
+    .pw-strength { margin-top:6px; font-size:0.72rem; height:22px; }
+    .strength-bar { height:3px; border-radius:2px; background:var(--surface3); margin-top:5px; overflow:hidden; }
+    .strength-fill { height:100%; border-radius:2px; transition:width 0.3s, background 0.3s; }
+
+    .form-panel { display:none; }
+    .form-panel.active { display:block; }
+
+    .footer-note { margin-top:22px; font-size:0.72rem; color:var(--muted2); text-align:center; line-height:1.7; }
+
+    .lockscreen { display:none; text-align:center; padding:20px 0; }
+    .lockscreen.show { display:block; }
+    .lock-icon { font-size:48px; margin-bottom:16px; }
+    .lock-timer { font-family:'Syne',sans-serif; font-size:2rem; font-weight:700; color:var(--red); margin:12px 0; }
+
+    @media(max-width:768px) { .left{display:none;} .right{width:100%;padding:36px 24px;} }
+  </style>
+</head>
+<body class="grid-bg">
+  <div class="left">
+    <div class="brand-wrap">
+      <div class="mahiru-mark">
+        <div class="logo">✦</div>
+        <div><div class="name">Mahiru</div><span class="sub">by LangitDev</span></div>
+      </div>
+    </div>
+    <h1 class="hero">AI yang<br>benar-benar<br><span class="hl">memahami</span><br>kamu.</h1>
+    <p class="hero-sub">Ditenagai Gemini, Grok, dan model eksklusif <strong>MahiruX Ultra</strong> — untuk coding, penulisan, analisis, dan lebih banyak lagi.</p>
+    <div class="feature-list">
+      <div class="feature-item"><div class="feature-dot">✦</div>MahiruX Ultra — model spesial LangitDev</div>
+      <div class="feature-item"><div class="feature-dot">◈</div>Gemini 2.0 Flash &amp; Gemini 1.5 Pro</div>
+      <div class="feature-item"><div class="feature-dot">𝕏</div>Grok 3 Mini &amp; Grok Beta</div>
+      <div class="feature-item"><div class="feature-dot">🔒</div>Login aman, brute-force protected</div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="tabs">
+      <button class="tab active" id="tabLogin" onclick="switchTab('login')">Masuk</button>
+      <button class="tab" id="tabRegister" onclick="switchTab('register')">Daftar</button>
+    </div>
+
+    <div class="lockscreen" id="lockscreen">
+      <div class="lock-icon">🔒</div>
+      <div class="form-title">Akun Terkunci</div>
+      <p class="form-subtitle">Terlalu banyak percobaan login yang gagal.</p>
+      <div class="lock-timer" id="lockTimer">15:00</div>
+      <p style="font-size:0.82rem;color:var(--muted)">Coba kembali setelah timer selesai.</p>
+    </div>
+
+    <div class="form-panel active" id="loginPanel">
+      <h2 class="form-title">Selamat kembali</h2>
+      <p class="form-subtitle">Masuk ke akun Mahiru kamu</p>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="loginUser" placeholder="masukkan username" autocomplete="username" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+          <button class="eye-btn" onclick="togglePw('loginPass',this)" type="button">👁</button>
+        </div>
+      </div>
+      <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
+        <span id="loginBtnText">Masuk</span>
+        <span class="spinner hidden" id="loginSpinner"></span>
+      </button>
+    </div>
+
+    <div class="form-panel" id="registerPanel">
+      <h2 class="form-title">Buat Akun</h2>
+      <p class="form-subtitle">Bergabung dengan Mahiru AI gratis</p>
+      <div class="form-group">
+        <label>Nama Lengkap</label>
+        <input type="text" id="regName" placeholder="nama kamu" autocomplete="name" maxlength="40">
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="regUser" placeholder="3–20 karakter, huruf/angka/_" autocomplete="username" maxlength="20" oninput="checkUsernameAvail(this.value)">
+        <div class="text-xs" id="usernameStatus" style="margin-top:5px;height:14px"></div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" id="regPass" placeholder="min. 8 karakter, kapital + angka" autocomplete="new-password" oninput="checkPwStrength(this.value)">
+          <button class="eye-btn" onclick="togglePw('regPass',this)" type="button">👁</button>
+        </div>
+        <div class="pw-strength">
+          <div id="pwStrengthText" class="text-xs text-muted"></div>
+          <div class="strength-bar"><div class="strength-fill" id="pwStrengthBar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <button class="btn-primary" id="registerBtn" onclick="handleRegister()">
+        <span id="registerBtnText">Buat Akun</span>
+        <span class="spinner hidden" id="registerSpinner"></span>
+      </button>
+    </div>
+
+    <div class="footer-note" id="footerNote">
+      Data disimpan lokal di browser kamu.<br>
+      Akun pertama yang mendaftar otomatis jadi <strong style="color:var(--gold)">admin</strong>.
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="assets/auth.js"></script>
+  <script>
+    if (MahiruAuth.getSession()) window.location.href = 'chat.html';
+
+    function switchTab(tab) {
+      ['login','register'].forEach(t => {
+        document.getElementById(t+'Panel').classList.toggle('active', t===tab);
+        document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active', t===tab);
+      });
+    }
+
+    function toast(msg, type='error') {
+      const el=document.getElementById('toast');
+      el.textContent=msg; el.className=`toast ${type} show`;
+      setTimeout(()=>el.classList.remove('show'),3500);
+    }
+
+    function setLoading(id,on) {
+      document.getElementById(id+'Btn').disabled=on;
+      document.getElementById(id+'BtnText').classList.toggle('hidden',on);
+      document.getElementById(id+'Spinner').classList.toggle('hidden',!on);
+    }
+
+    function togglePw(id,btn) {
+      const inp=document.getElementById(id);
+      inp.type=inp.type==='password'?'text':'password';
+      btn.textContent=inp.type==='password'?'👁':'🙈';
+    }
+
+    function checkPwStrength(pw) {
+      let s=0;
+      if(pw.length>=8)s++; if(/[A-Z]/.test(pw))s++; if(/[0-9]/.test(pw))s++;
+      if(/[^A-Za-z0-9]/.test(pw))s++; if(pw.length>=12)s++;
+      const cfgs=[
+        {w:'0%',c:'transparent',t:''},
+        {w:'25%',c:'var(--red)',t:'Lemah'},
+        {w:'50%',c:'#f97316',t:'Sedang'},
+        {w:'75%',c:'#facc15',t:'Kuat'},
+        {w:'100%',c:'var(--green)',t:'Sangat Kuat'},
+        {w:'100%',c:'var(--green)',t:'Sangat Kuat ✓'},
+      ];
+      const c=cfgs[Math.min(s,5)];
+      document.getElementById('pwStrengthBar').style.cssText=`width:${c.w};background:${c.c}`;
+      const t=document.getElementById('pwStrengthText');
+      t.textContent=c.t; t.style.color=c.c;
+    }
+
+    let uct;
+    function checkUsernameAvail(val) {
+      clearTimeout(uct);
+      const el=document.getElementById('usernameStatus');
+      if(!val){el.textContent='';return;}
+      if(!/^[a-zA-Z0-9_]+$/.test(val)||val.length<3){
+        el.style.color='var(--red)';el.textContent='✗ Hanya huruf/angka/_ (min. 3)';return;
+      }
+      uct=setTimeout(()=>{
+        const users=MahiruAuth.getUsers();
+        if(users[val.toLowerCase()]){
+          el.style.color='var(--red)';el.textContent='✗ Username sudah digunakan';
+        } else {
+          el.style.color='var(--green)';el.textContent='✓ Username tersedia';
+        }
+      },400);
+    }
+
+    async function handleLogin() {
+      const user=document.getElementById('loginUser').value.trim();
+      const pass=document.getElementById('loginPass').value;
+      if(!user||!pass) return toast('Isi username dan password');
+      setLoading('login',true);
+      const res=await MahiruAuth.login(user,pass);
+      setLoading('login',false);
+      if(!res.ok){ if(res.locked)showLockscreen(user); else toast(res.msg); return; }
+      toast('Selamat datang, '+res.session.name+'!','success');
+      setTimeout(()=>window.location.href='chat.html',900);
+    }
+
+    async function handleRegister() {
+      const name=document.getElementById('regName').value.trim();
+      const user=document.getElementById('regUser').value.trim();
+      const pass=document.getElementById('regPass').value;
+      setLoading('register',true);
+      const res=await MahiruAuth.register(name,user,pass);
+      setLoading('register',false);
+      if(!res.ok) return toast(res.msg);
+      toast(res.msg,'success');
+      setTimeout(()=>switchTab('login'),1200);
+    }
+
+    function showLockscreen(username) {
+      document.getElementById('loginPanel').classList.remove('active');
+      document.getElementById('lockscreen').classList.add('show');
+      document.getElementById('footerNote').style.display='none';
+      const iv=setInterval(()=>{
+        const lockouts=JSON.parse(localStorage.getItem('mhr_lockouts')||'{}');
+        const l=lockouts[username?.toLowerCase()];
+        if(!l||Date.now()>l.until){
+          clearInterval(iv);
+          document.getElementById('lockscreen').classList.remove('show');
+          document.getElementById('loginPanel').classList.add('active');
+          document.getElementById('footerNote').style.display='';
+          toast('Akun bisa digunakan kembali','info');
+          return;
+        }
+        const rem=l.until-Date.now();
+        const m=Math.floor(rem/60000), s=Math.floor((rem%60000)/1000);
+        document.getElementById('lockTimer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      },1000);
+    }
+
+    document.addEventListener('keydown',e=>{
+      if(e.key!=='Enter') return;
+      document.getElementById('loginPanel').classList.contains('active') ? handleLogin() : handleRegister();
+    });
+  </script>
+</body>
+</html>
